@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite_demo/data/dbHelper.dart';
 import 'package:sqflite_demo/models/product.dart';
 import 'package:sqflite_demo/screens/product_add.dart';
+import 'package:sqflite_demo/screens/product_detail.dart';
 
 class ProductList extends StatefulWidget {
   @override
@@ -52,7 +53,9 @@ class _ProductListState extends State {
                   backgroundColor: Colors.black12, child: Text("p")),
               title: Text(this.products[position].name),
               subtitle: Text(this.products[position].description),
-              onTap: () {},
+              onTap: () {
+                goToDetail(this.products[position]);
+              },
             ),
           );
         });
@@ -73,8 +76,20 @@ class _ProductListState extends State {
     var productsFuture = dbHelper
         .getProducts(); //bu sayfa açıldığında ürünler gelene kadar asenkron yapının çalıştığını görüyoruz.
     productsFuture.then((data) {
-      this.products = data;
-      productCount = data.length;
+      setState(() {
+        this.products = data;
+        productCount = data.length;
+      });
     });
+  }
+
+  void goToDetail(Product product) async {
+    bool result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ProductDetail(product)));
+    if (result != null) {
+      if (result) {
+        getProducts();
+      }
+    }
   }
 }
